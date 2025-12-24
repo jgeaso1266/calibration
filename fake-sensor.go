@@ -33,17 +33,17 @@ type Vector3 struct {
 }
 
 type MonitorConfig struct {
-	Center Vector3 `json:"center"` // mm - center point of monitor
-	Normal Vector3 `json:"normal"` // direction vector - which way monitor faces
-	Up     Vector3 `json:"up"`     // direction vector - which way is "up"
-	Width  float64 `json:"width"`  // mm
-	Height float64 `json:"height"` // mm
+	Center *Vector3 `json:"center,omitempty"` // mm - center point of monitor
+	Normal *Vector3 `json:"normal,omitempty"` // direction vector - which way monitor faces
+	Up     *Vector3 `json:"up,omitempty"`     // direction vector - which way is "up"
+	Width  float64  `json:"width"`            // mm
+	Height float64  `json:"height"`           // mm
 }
 
 type SensorConfig struct {
-	Arm     string        `json:"arm"`
-	Gantry  string        `json:"gantry"`
-	Monitor MonitorConfig `json:"monitor"`
+	Arm     string         `json:"arm"`
+	Gantry  string         `json:"gantry"`
+	Monitor *MonitorConfig `json:"monitor,omitempty"`
 }
 
 // Validate ensures all parts of the config are valid and important fields exist.
@@ -62,28 +62,6 @@ func (cfg *SensorConfig) Validate(path string) ([]string, []string, error) {
 	}
 	if cfg.Gantry == "" {
 		return nil, nil, fmt.Errorf("missing 'gantry' field in %s", path)
-	}
-
-	// Set defaults for monitor configuration if not specified
-	if cfg.Monitor.Center.X == 0 && cfg.Monitor.Center.Y == 0 && cfg.Monitor.Center.Z == 0 {
-		cfg.Monitor.Center = Vector3{X: 250, Y: -400, Z: 200}
-	}
-
-	if cfg.Monitor.Normal.X == 0 && cfg.Monitor.Normal.Y == 0 && cfg.Monitor.Normal.Z == 0 {
-		// Default: facing forward (positive Y direction)
-		cfg.Monitor.Normal = Vector3{X: 0, Y: 1, Z: 0}
-	}
-
-	if cfg.Monitor.Width == 0 {
-		cfg.Monitor.Width = 500 // mm
-	}
-
-	if cfg.Monitor.Height == 0 {
-		cfg.Monitor.Height = 300 // mm
-	}
-
-	if cfg.Monitor.Up.X == 0 && cfg.Monitor.Up.Y == 0 && cfg.Monitor.Up.Z == 0 {
-		cfg.Monitor.Up = Vector3{X: 0, Y: 0, Z: 1}
 	}
 
 	return []string{cfg.Arm, cfg.Gantry}, nil, nil
@@ -127,6 +105,26 @@ func NewFakeSensor(_ context.Context, deps resource.Dependencies, name resource.
 	var err error
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
 
+	// Apply defaults for monitor configuration if not specified
+	if conf.Monitor == nil {
+		conf.Monitor = &MonitorConfig{}
+	}
+	if conf.Monitor.Center == nil {
+		conf.Monitor.Center = &Vector3{X: 250, Y: -400, Z: 200}
+	}
+	if conf.Monitor.Normal == nil {
+		conf.Monitor.Normal = &Vector3{X: 0, Y: 1, Z: 0}
+	}
+	if conf.Monitor.Width == 0 {
+		conf.Monitor.Width = 500
+	}
+	if conf.Monitor.Height == 0 {
+		conf.Monitor.Height = 300
+	}
+	if conf.Monitor.Up == nil {
+		conf.Monitor.Up = &Vector3{X: 0, Y: 0, Z: 1}
+	}
+
 	s := &calibrationFakeSensor{
 		name:       name,
 		logger:     logger,
@@ -141,6 +139,9 @@ func NewFakeSensor(_ context.Context, deps resource.Dependencies, name resource.
 		monitorHeight:   conf.Monitor.Height,
 		monitorUpVector: r3.Vector{X: conf.Monitor.Up.X, Y: conf.Monitor.Up.Y, Z: conf.Monitor.Up.Z},
 	}
+
+	logger.Infof("Fake sensor monitor config: center=%+v, normal=%+v, up=%+v, w=%.1f, h=%.1f",
+		s.monitorCenter, s.monitorNormal, s.monitorUpVector, s.monitorWidth, s.monitorHeight)
 
 	s.arm, err = arm.FromProvider(deps, conf.Arm)
 	if err != nil {
