@@ -1,0 +1,36 @@
+{
+  "$schema": "https://dl.viam.dev/module.schema.json",
+  "module_id": "jalen-monitor-cleaning:calibration",
+  "visibility": "private",
+  "url": "",
+  "description": "Components for calibrating and detecting monitor surfaces using ultrasonic sensors",
+  "models": [
+    {
+      "api": "rdk:component:sensor",
+      "model": "jalen-monitor-cleaning:calibration:fake-sensor",
+      "short_description": "Fully configurable fake ultrasonic sensor that simulates distance readings for a monitor",
+      "markdown_link": "README.md#model-jalen-monitor-cleaningcalibrationfake-sensor"
+    },
+    {
+      "api": "rdk:component:generic",
+      "model": "jalen-monitor-cleaning:calibration:monitor-calibration",
+      "short_description": "Control logic to calibrate monitor position using an arm and gantry",
+      "markdown_link": "README.md#model-jalen-monitor-cleaningcalibrationmonitor-calibration"
+    }
+  ],
+  "applications": null,
+  "markdown_link": "README.md",
+  "entrypoint": "bin/calibration",
+  "first_run": "",
+  "build": {
+    "build": "make module.tar.gz",
+    "setup": "make setup",
+    "path": "module.tar.gz",
+    "arch": [
+      "linux/amd64",
+      "linux/arm64",
+      "darwin/arm64",
+      "windows/amd64"
+    ]
+  }
+}

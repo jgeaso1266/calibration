@@ -1,0 +1,13 @@
+{
+  "module_name": "calibration",
+  "namespace": "jalen-monitor-cleaning",
+  "language": "go",
+  "resource_type": "component",
+  "resource_subtype": "sensor",
+  "model_name": "test-sensor",
+  "enable_cloud_build": false,
+  "initialize_git": false,
+  "generator_version": "0.1.0",
+  "generated_on": "2025-12-20T13:32:59.52554Z",
+  "module_readme_link": "README.md"
+}
