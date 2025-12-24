@@ -2,7 +2,7 @@
   "$schema": "https://dl.viam.dev/module.schema.json",
   "module_id": "jalen-monitor-cleaning:calibration",
   "visibility": "private",
-  "url": "",
+  "url": "https://github.com/jgeaso1266/calibration/tree/main",
   "description": "Components for calibrating and detecting monitor surfaces using ultrasonic sensors",
   "models": [
     {
