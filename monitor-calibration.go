@@ -20,8 +20,8 @@ var (
 )
 
 func init() {
-	resource.RegisterComponent(generic.API, FakeSensor,
-		resource.Registration[resource.Resource, *SensorConfig]{
+	resource.RegisterComponent(generic.API, MonitorCalibration,
+		resource.Registration[resource.Resource, *Config]{
 			Constructor: newMonitorCalibration,
 		},
 	)
@@ -88,7 +88,7 @@ func newMonitorCalibration(ctx context.Context, deps resource.Dependencies, rawC
 
 }
 
-func NewMonitorCalibration(_ context.Context, deps resource.Dependencies, name resource.Name, conf *Config, logger logging.Logger) (resource.Resource, error) {
+func NewMonitorCalibration(ctx context.Context, deps resource.Dependencies, name resource.Name, conf *Config, logger logging.Logger) (resource.Resource, error) {
 	var err error
 
 	cancelCtx, cancelFunc := context.WithCancel(context.Background())
