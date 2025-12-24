@@ -157,7 +157,7 @@ func (s *calibrationFakeSensor) Name() resource.Name {
 }
 
 // Readings implements the sensor.Sensor interface
-// Returns a map with "distance" key containing the ultrasonic reading in meters
+// Returns a map with "distance" key containing the ultrasonic reading in centimeters
 func (s *calibrationFakeSensor) Readings(ctx context.Context, extra map[string]interface{}) (map[string]interface{}, error) {
 	// Get sensor pose in world coordinates using the frame system
 	sensorPoseInFrame, err := s.fs.GetPose(ctx, s.name.Name, "world", nil, nil)
@@ -194,11 +194,11 @@ func (s *calibrationFakeSensor) Readings(ctx context.Context, extra map[string]i
 			sensorPos.X, sensorPos.Y, sensorPos.Z)
 	}
 
-	// Convert to meters for return value
-	distanceMeters := distanceMM / 1000.0
+	// Convert to centimeters for return value (real ultrasonic sensors return cm)
+	distanceCM := distanceMM / 10.0
 
 	return map[string]interface{}{
-		"distance": distanceMeters,
+		"distance": distanceCM,
 	}, nil
 }
 

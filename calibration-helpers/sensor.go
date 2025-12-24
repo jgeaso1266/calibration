@@ -51,9 +51,9 @@ func GetSurfacePoint(ctx context.Context, logger logging.Logger, fs framesystem.
 		return SensorReading{}, fmt.Errorf("failed to get sensor reading: %w", err)
 	}
 
-	// Sensor returns distance in meters, convert to millimeters
-	depthMeters := depthFloat(depthReading)
-	depth := depthMeters * 1000.0
+	// Sensor returns distance in centimeters, convert to millimeters
+	depthCM := depthFloat(depthReading)
+	depth := depthCM * 10.0
 
 	// Calculate actual surface point
 	surfacePoint, err := calculateWorldPoint(ctx, logger, fs, sensor.Name().Name, depth)
