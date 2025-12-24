@@ -26,9 +26,24 @@ func init() {
 	)
 }
 
+type Vector3 struct {
+	X float64 `json:"x"`
+	Y float64 `json:"y"`
+	Z float64 `json:"z"`
+}
+
+type MonitorConfig struct {
+	Center Vector3 `json:"center"` // mm - center point of monitor
+	Normal Vector3 `json:"normal"` // direction vector - which way monitor faces
+	Up     Vector3 `json:"up"`     // direction vector - which way is "up"
+	Width  float64 `json:"width"`  // mm
+	Height float64 `json:"height"` // mm
+}
+
 type SensorConfig struct {
-	Arm    string `json:"arm"`
-	Gantry string `json:"gantry"`
+	Arm     string        `json:"arm"`
+	Gantry  string        `json:"gantry"`
+	Monitor MonitorConfig `json:"monitor"`
 }
 
 // Validate ensures all parts of the config are valid and important fields exist.
@@ -48,6 +63,29 @@ func (cfg *SensorConfig) Validate(path string) ([]string, []string, error) {
 	if cfg.Gantry == "" {
 		return nil, nil, fmt.Errorf("missing 'gantry' field in %s", path)
 	}
+
+	// Set defaults for monitor configuration if not specified
+	if cfg.Monitor.Center.X == 0 && cfg.Monitor.Center.Y == 0 && cfg.Monitor.Center.Z == 0 {
+		cfg.Monitor.Center = Vector3{X: 250, Y: -400, Z: 200}
+	}
+
+	if cfg.Monitor.Normal.X == 0 && cfg.Monitor.Normal.Y == 0 && cfg.Monitor.Normal.Z == 0 {
+		// Default: facing forward (positive Y direction)
+		cfg.Monitor.Normal = Vector3{X: 0, Y: 1, Z: 0}
+	}
+
+	if cfg.Monitor.Width == 0 {
+		cfg.Monitor.Width = 500 // mm
+	}
+
+	if cfg.Monitor.Height == 0 {
+		cfg.Monitor.Height = 300 // mm
+	}
+
+	if cfg.Monitor.Up.X == 0 && cfg.Monitor.Up.Y == 0 && cfg.Monitor.Up.Z == 0 {
+		cfg.Monitor.Up = Vector3{X: 0, Y: 0, Z: 1}
+	}
+
 	return []string{cfg.Arm, cfg.Gantry}, nil, nil
 }
 
@@ -96,42 +134,12 @@ func NewFakeSensor(_ context.Context, deps resource.Dependencies, name resource.
 		cancelCtx:  cancelCtx,
 		cancelFunc: cancelFunc,
 
-		// Monitor centered at X=250mm (middle width), Y=-400 (in front of arm), Z=200mm (middle height)
-		monitorCenter: r3.Vector{X: 250, Y: -400, Z: 200},
-
-		// Monitor with compound rotation: 15° around X-axis, then 10° around Y-axis
-		// This tests orientation calculation with a non-axis-aligned plane
-		monitorNormal: func() r3.Vector {
-			// Start with normal (0, 1, 0)
-			normal := r3.Vector{X: 0, Y: 1, Z: 0}
-
-			// First rotate around X-axis by 15°
-			angleX := 15.0 * math.Pi / 180.0
-			cosX, sinX := math.Cos(angleX), math.Sin(angleX)
-			normal = r3.Vector{
-				X: normal.X,
-				Y: normal.Y*cosX - normal.Z*sinX,
-				Z: normal.Y*sinX + normal.Z*cosX,
-			}
-
-			// Then rotate around Y-axis by 10°
-			angleY := 10.0 * math.Pi / 180.0
-			cosY, sinY := math.Cos(angleY), math.Sin(angleY)
-			normal = r3.Vector{
-				X: normal.X*cosY + normal.Z*sinY,
-				Y: normal.Y,
-				Z: -normal.X*sinY + normal.Z*cosY,
-			}
-
-			return normal
-		}(),
-
-		// Monitor dimensions (typical desktop monitor)
-		monitorWidth:  500, // mm
-		monitorHeight: 300, // mm
-
-		// Up vector (Z direction is up)
-		monitorUpVector: r3.Vector{X: 0, Y: 0, Z: 1},
+		// Monitor configuration from config
+		monitorCenter:   r3.Vector{X: conf.Monitor.Center.X, Y: conf.Monitor.Center.Y, Z: conf.Monitor.Center.Z},
+		monitorNormal:   r3.Vector{X: conf.Monitor.Normal.X, Y: conf.Monitor.Normal.Y, Z: conf.Monitor.Normal.Z},
+		monitorWidth:    conf.Monitor.Width,
+		monitorHeight:   conf.Monitor.Height,
+		monitorUpVector: r3.Vector{X: conf.Monitor.Up.X, Y: conf.Monitor.Up.Y, Z: conf.Monitor.Up.Z},
 	}
 
 	s.arm, err = arm.FromProvider(deps, conf.Arm)

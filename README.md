@@ -6,7 +6,7 @@ This module provides components for calibrating and detecting monitor surfaces u
 
 A simulated ultrasonic sensor that models ray-casting against a virtual monitor plane. This component is useful for testing calibration algorithms without physical hardware.
 
-The virtual monitor has a compound rotation (15° around X-axis, 10° around Y-axis) to test orientation calculations with non-axis-aligned planes.
+The virtual monitor is fully configurable, allowing you to simulate different monitor positions, orientations, and sizes.
 
 ### Configuration
 
@@ -16,17 +16,44 @@ This model requires the following configuration attributes:
 
 The following attributes are available for this model:
 
-| Name     | Type   | Inclusion | Description                |
-|----------|--------|-----------|----------------------------|
-| `arm`    | string | Required  | Name of the arm component |
-| `gantry` | string | Required  | Name of the gantry component |
+| Name      | Type   | Inclusion | Description                |
+|-----------|--------|-----------|----------------------------|
+| `arm`     | string | Required  | Name of the arm component |
+| `gantry`  | string | Required  | Name of the gantry component |
+| `monitor` | object | Optional  | Virtual monitor configuration (see below) |
+
+**Monitor Configuration** (all optional, with defaults):
+
+| Field    | Type   | Default | Description                |
+|----------|--------|---------|----------------------------|
+| `center` | object | `{x: 250, y: -400, z: 200}` | Center point of monitor (mm) |
+| `normal` | object | `{x: 0, y: 1, z: 0}` | Direction vector monitor faces (forward) |
+| `up`     | object | `{x: 0, y: 0, z: 1}` | Up direction vector |
+| `width`  | float  | 500     | Width of monitor (mm) |
+| `height` | float  | 300     | Height of monitor (mm) |
 
 #### Example Configuration
 
+Minimal configuration (uses defaults):
 ```json
 {
   "arm": "my-arm",
   "gantry": "my-gantry"
+}
+```
+
+Full configuration with custom monitor:
+```json
+{
+  "arm": "my-arm",
+  "gantry": "my-gantry",
+  "monitor": {
+    "center": {"x": 250, "y": -400, "z": 200},
+    "normal": {"x": 0.042, "y": 0.966, "z": 0.259},
+    "up": {"x": 0, "y": 0, "z": 1},
+    "width": 500,
+    "height": 300
+  }
 }
 ```
 
