@@ -117,6 +117,9 @@ func NewMonitorCalibration(ctx context.Context, deps resource.Dependencies, name
 	}
 
 	s.fs, err = framesystem.FromDependencies(deps)
+	if err != nil {
+		return nil, err
+	}
 
 	s.calibrationConfig = calibrationhelpers.CalibrationConfig{
 		Hardware: calibrationhelpers.HardwareConfig{
