@@ -76,14 +76,6 @@ func NewDefaultConfig() CalibrationConfig {
 			PlaneThreshold: 20.0, // mm
 			EdgeStepSize:   10.0, // mm
 		},
-		Robot: RobotConfig{
-			Address:    getEnvOrDefault("VIAM_ROBOT_ADDRESS", ""),
-			MachineID:  getEnvOrDefault("VIAM_MACHINE_ID", ""),
-			APIKey:     getEnvOrDefault("VIAM_API_KEY", ""),
-			SensorName: getEnvOrDefault("VIAM_SENSOR_NAME", "test-sensor-for-monitor"),
-			ArmName:    getEnvOrDefault("VIAM_ARM_NAME", "arm-1"),
-			GantryName: getEnvOrDefault("VIAM_GANTRY_NAME", "gantry-1"),
-		},
 		ArmPositions: DefaultArmPositions,
 	}
 }
