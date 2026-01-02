@@ -59,7 +59,7 @@ Full configuration with custom monitor:
 
 ### Readings
 
-The sensor returns distance readings in **centimeters** through the standard `Readings()` method. It automatically calculates the sensor pose using the frame system based on the current arm and gantry positions.
+The sensor returns distance readings in **meters** through the standard `Readings()` method. It automatically calculates the sensor pose using the frame system based on the current arm and gantry positions.
 
 **Returns:**
 ```json
@@ -69,8 +69,8 @@ The sensor returns distance readings in **centimeters** through the standard `Re
 ```
 
 The sensor simulates realistic behavior:
-- Returns actual distance (in centimeters) when the ray hits the virtual monitor surface
-- Returns 400.0 cm (max range, 4000mm) when the ray misses the monitor
+- Returns actual distance (in meters) when the ray hits the virtual monitor surface
+- Returns 4.0 m (max range, 4000mm) when the ray misses the monitor
 - Adds ±2mm noise to simulate real sensor readings
 
 ## Model jalen-monitor-cleaning:calibration:monitor-calibration
